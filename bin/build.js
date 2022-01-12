@@ -9,7 +9,9 @@ export const build = async () => {
   const script = await readFile('./build/index.js', 'utf8');
   const style = await readFile('./src/style.css', 'utf8');
 
-  const output = template.replace('{{ script }}', script).replace('<style></style>', `<style>${style}</style>`);
+  const output = template
+    .replace(/<!--\s*{{\s*script\s*}}\s*-->/, `<script>${script}</script>`)
+    .replace(/<!--\s*{{\s*style\s*}}\s*-->/, `<style>${style}</style>`);
 
   const minified = await minify(output, {
     /*

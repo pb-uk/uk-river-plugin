@@ -10,6 +10,8 @@
     "build": "rimraf build dist && npm run build:rebuild",
     "build:rebuild": "rollup -c && npm run build:html",
     "build:html": "node ./bin/build",
+    "lint": "prettier . --check",
+    "lint:fix": "prettier . --write",
     "build:watch": "chokidar src -c \"npm run build\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,5 +32,8 @@
     "live-server": "^1.2.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.63.0"
+  },
+  "dependencies": {
+    "prettier": "^2.5.1"
   }
 }

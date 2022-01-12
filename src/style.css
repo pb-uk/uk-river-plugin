@@ -1,4 +1,3 @@
-
 /* Critical normalizations */
 
 html {
@@ -23,18 +22,13 @@ html {
 *,
 *::before,
 *::after {
-      box-sizing: inherit;
+  box-sizing: inherit;
 }
 
 /* System font stack. */
 body {
-  font-family: system-ui,    -apple-system,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue", Arial,
-    "Noto Sans",
-    "Liberation Sans",
-    sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
 }
 
 /* Site styles. */
