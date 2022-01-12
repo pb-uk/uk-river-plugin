@@ -31,8 +31,7 @@ const showStation = async ({ params }) => {
 };
 
 const showExampleStation = async () => {
-  console.log(params);
-  const station = { label: 'Example stations' };
+  const station = { label: 'Example station' };
   document.getElementById('app').prepend(`${station.label}`);
   // showPlot(id);
 };
