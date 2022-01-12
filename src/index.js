@@ -29,13 +29,12 @@ const showStation = async ({ id }) => {
   showPlot(id);
 };
 
-const routes = [[/^\/station\/([^\/]*)$/, showStation, ['id']]];
+const routes = [[/^\/station\/([^/]*)$/, showStation, ['id']]];
 
 const run = async () => {
   const path = window.location.hash.substring(1);
 
   let i = -1;
-  let found = false;
   let matches = null;
   while (i < routes.length - 1 && matches === null) {
     ++i;
