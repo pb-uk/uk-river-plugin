@@ -14,7 +14,6 @@ export const build = async () => {
     .replace(/<!--\s*{{\s*style\s*}}\s*-->/, `<style>${style}</style>`);
 
   const minified = await minify(output, {
-    /*
     collapseBooleanAttributes: true,
     collapseWhitespace: true,
     decodeEntities: true,
@@ -24,12 +23,12 @@ export const build = async () => {
     removeAttributeQuotes: true,
     removeComments: true,
     removeEmptyAttributes: true,
-    removeOptionalTags: true,
+    // Breaks live reload and doesn't save much.
+    // removeOptionalTags: true,
     removeRedundantAttributes: true,
     removeScriptTypeAttributes: true,
     removeStyleLinkTypeAttributes: true,
     useShortDoctype: true,
-    */
   });
 
   await mkdirPromise;

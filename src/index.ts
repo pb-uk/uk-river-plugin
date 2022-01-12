@@ -5,7 +5,7 @@ import { fetchStation, fetchStationData } from './api-client.js';
 const plot = (data) => {
   const svg = createSvgElememt('svg', { viewBox: '0 0 100 100' });
   console.log(data);
-  const d = 'M0,0L50,50';
+  const d = 'M10,10H90V90H10Z';
 
   svg.append(
     createSvgElememt('path', {
@@ -23,13 +23,24 @@ const showPlot = async (id) => {
   plot(data);
 };
 
-const showStation = async ({ id }) => {
+const showStation = async ({ params }) => {
+  const { id } = params;
+  showPlot(id);
   const [station] = await fetchStation(id);
   document.getElementById('app').prepend(`${station.label}`);
-  showPlot(id);
 };
 
-const routes = [[/^\/station\/([^/]*)$/, showStation, ['id']]];
+const showExampleStation = async () => {
+  console.log(params);
+  const station = { label: 'Example stations' };
+  document.getElementById('app').prepend(`${station.label}`);
+  // showPlot(id);
+};
+
+const routes = [
+  [/^\/station\/([^/]*)$/, showStation, ['id']],
+  [/^\/example-station\/([^/]*)$/, showExampleStation],
+];
 
 const run = async () => {
   const path = window.location.hash.substring(1);
@@ -51,7 +62,7 @@ const run = async () => {
     params[name] = matches[i + 1];
   });
   try {
-    await fn(params);
+    await fn({ params });
   } catch (err) {
     console.log(err.name, err.message, err.response);
   }
