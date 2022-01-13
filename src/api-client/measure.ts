@@ -3,8 +3,15 @@
  */
 import { stripPath } from './utils';
 
-//
-const measureIdRegex = /([^-]*)-(([^-]*)-([^-]*))-([^-]*-[^-]*)-([^-]*)/;
+const measureIdRegex =
+  /*
+   ([^-]*) Station id. */
+  //       (([^-]*)-([^-]*)) e.g. level-stage.
+  //        ([^-]*)  e.g. level.
+  //                ([^-]*) e.g. stage.
+  //                         ([^-]*-[^-]*) e.g. i-15_min.
+  //                                       ([^-]*) unit.
+  /([^-]*)-(([^-]*)-([^-]*))-([^-]*-[^-]*)-([^-]*)/;
 
 /**
  * Parse a measure id into usable parts.

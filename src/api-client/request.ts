@@ -1,5 +1,12 @@
 const baseUrl = 'https://environment.data.gov.uk/flood-monitoring';
 
+/**
+ * All API fetch methods should return this type.
+ */
+export type ApiResponse<T> = [T, Response];
+
+// Refactor after here.
+
 export type ApiCollectionResponseData<T> = {
   items: T[];
 };

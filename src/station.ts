@@ -31,15 +31,13 @@ export const stationPage = async ({ params }: Route) => {
   const plotPromise = showPlot(id);
   const [station] = await fetchStation(id);
   const el = document.getElementById('app');
-  if ('label' in station && typeof station.label === 'string') {
-    if (el) el.prepend(`${station.label}`);
-  }
+  if (el) el.prepend(station.name);
   return plotPromise;
 };
 
 export const exampleStationPage = () => {
-  const station = { label: 'Example station' };
+  const station = { name: 'Example station' };
   const el = document.getElementById('app');
-  if (el) el.prepend(`${station.label}`);
+  if (el) el.prepend(station.name);
   // showPlot(id);
 };

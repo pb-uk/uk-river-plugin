@@ -1,95 +1,50 @@
 import { request } from './request';
-import type { ApiCollectionResponseData, ApiItemResponseData } from './request';
-import { parseMeasureId } from './measure';
+import type { ApiResponse } from './request';
 
-type ApiResponseStationDataItem = {
-  measure: string;
-  dateTime: string;
-  value: string;
+/**
+ * The type returned by fetchStation.
+ */
+type Station = {
+  id: string;
+  name: string;
 };
 
-type StationDataOptions = {
-  limit?: number;
-  ascending?: boolean;
-  descending?: boolean;
-  since?: string;
+/**
+ * A model of the data received from the server.
+ */
+type StationResponseData = {
+  items: {
+    label: string;
+    stationReference: string;
+  };
 };
 
-type StationDataItem = [Date, number];
-
-export type StationDataSeries = {
-  measure: Record<string, unknown>;
-  data: StationDataItem[];
+/**
+ * Transform the data returned from the server into a Server object.
+ *
+ * @param data The data from the server.
+ * @returns The corresponding Station object.
+ */
+const parseStationResponse = (data: StationResponseData): Station => {
+  const { items } = data;
+  return {
+    id: items.stationReference,
+    name: items.label,
+  };
 };
 
-const parseStationResponse = (data: ApiItemResponseData) => {
-  return data.items;
-};
-
-const parseStationDataResponse = (
-  data: ApiCollectionResponseData<ApiResponseStationDataItem>,
-  options: StationDataOptions = {}
-): Record<string, StationDataSeries[]> => {
-  // Build an object grouping series of readings with the same measure Id.
-  const series: Record<string, StationDataItem[]> = {};
-  data.items.forEach(({ measure, dateTime, value }) => {
-    series[measure] = series[measure] || [];
-    series[measure].push([new Date(dateTime), parseFloat(value)]);
-  });
-
-  // Regroup the series using the short measure parameter e.g. `level`, `flow`.
-  const categories: Record<string, StationDataSeries[]> = {};
-  Object.entries(series).forEach(([key, data]) => {
-    const measure = parseMeasureId(key);
-    categories[measure.parameter] = categories[measure.parameter] || [];
-    categories[measure.parameter].push({ measure, data });
-  });
-
-  // Sort each of the series in each of the categories.
-  const { ascending, descending } = options;
-  if (ascending || descending) {
-    // Note that subtract works for Dates as well as numbers.
-    // Avoid fighting Typescript here.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore:next-line
-    const compare = ascending ? ([a], [b]) => a - b : ([a], [b]) => b - a;
-    Object.values(categories).forEach((series) => {
-      series.forEach((entry) => {
-        // Avoid fighting Typescript here.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore:next-line
-        entry.data.sort(compare);
-      });
-    });
-  }
-  return categories;
-};
-
+/**
+ * Fetch a station from the server.
+ *
+ * If the station is not found an ApiError is thrown from request().
+ *
+ * @param id The id (station reference) of the station.
+ * @returns The corresponding Station object.
+ */
 export const fetchStation = async (
   id: string
-): Promise<[Record<string, unknown>, Response]> => {
+): Promise<ApiResponse<Station>> => {
   const response = await request(`/id/stations/${id}`);
-  const data = <ApiItemResponseData>await response.json();
+  const data = <StationResponseData>await response.json();
   return [parseStationResponse(data), response];
-};
-
-const stationDataDefaults: StationDataOptions = {
-  limit: 1000,
-};
-
-export const fetchStationData = async (
-  id: string,
-  options: StationDataOptions = {}
-): Promise<[Record<string, StationDataSeries[]>, Response]> => {
-  const settings = { ...stationDataDefaults, ...options };
-  const { ascending, descending, since, limit: _limit } = settings;
-  const params: Record<string, unknown> = { since, _limit };
-  if (ascending || descending) {
-    params._sorted = true;
-  }
-  const response = await request(`/id/stations/${id}/readings`, { params });
-  const data = <ApiCollectionResponseData<ApiResponseStationDataItem>>(
-    await response.json()
-  );
-  return [parseStationDataResponse(data, { ascending, descending }), response];
 };
