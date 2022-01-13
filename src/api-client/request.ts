@@ -39,10 +39,6 @@ export class ApiError extends Error {
   }
 }
 
-export type RequestOptions = {
-  params?: Record<string, unknown>;
-};
-
 // This needs testing for edge cases.
 export const buildQueryString = (params: Record<string, unknown>): string => {
   const parts: string[] = [];
@@ -74,14 +70,29 @@ export const buildQueryString = (params: Record<string, unknown>): string => {
   return '';
 };
 
-export const request = async (path: string, settings: RequestOptions = {}) => {
+export type RequestOptions = {
+  params?: Record<string, unknown>;
+  accept?: string;
+};
+
+const defaults = {
+  accept: 'application/json',
+};
+
+export const request = async (path: string, options: RequestOptions = {}) => {
+  const settings = { ...defaults, ...options };
   let response: Response | undefined;
-  const { params } = settings;
   try {
+    // Create any query string.
+    const { params, accept } = settings;
     const url = params
       ? `${baseUrl}${path}${buildQueryString(params)}`
       : `${baseUrl}${path}`;
-    response = await fetch(url);
+
+    // Create any headers.
+    const headers: HeadersInit = accept ? { accept } : {};
+
+    response = await fetch(url, { headers });
   } catch (err) {
     throw new ApiError(<Error>err, response);
   }
