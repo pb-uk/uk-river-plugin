@@ -1,15 +1,22 @@
 import { stationPage, exampleStationPage } from './station';
+import type { RouteDefinition } from './router';
 
-const routes = [
+const routes: RouteDefinition[] = [
   [/^\/station\/([^/]*)$/, stationPage, ['id']],
   [/^\/example-station\/([^/]*)$/, exampleStationPage],
 ];
 
-const run = async () => {
+const run = () => {
+  asyncRun().catch((err) => {
+    throw err;
+  });
+};
+
+const asyncRun = async () => {
   const path = window.location.hash.substring(1);
 
   let i = -1;
-  let matches = null;
+  let matches: string[] | null = null;
   while (i < routes.length - 1 && matches === null) {
     ++i;
     matches = path.match(routes[i][0]);
@@ -20,9 +27,9 @@ const run = async () => {
     return;
   }
   const [, fn, names] = routes[i];
-  const params = {};
+  const params: Record<string, string> = {};
   (names ?? []).forEach((name, i) => {
-    params[name] = matches[i + 1];
+    params[name] = (<string[]>matches)[i + 1];
   });
   try {
     await fn({ params });
