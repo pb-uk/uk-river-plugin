@@ -3,7 +3,7 @@ import type { RouteDefinition } from './router';
 
 const routes: RouteDefinition[] = [
   [/^\/station\/([^/]*)$/, stationPage, ['id']],
-  [/^\/example-station\/([^/]*)$/, exampleStationPage],
+  [/^\/example-station([^/]*)$/, exampleStationPage],
 ];
 
 const run = () => {

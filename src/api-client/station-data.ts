@@ -6,12 +6,13 @@ import { parseMeasureId } from './measure';
 /**
  * The type returned by fetchStationData.
  */
-type StationData = {
+export type StationData = {
   [measureType: string]: StationDataSeries[];
 };
 
 export type StationDataSeries = {
-  measure: Record<string, unknown>;
+  meta?: Record<string, unknown>;
+  measure?: Record<string, unknown>;
   data: StationDataItem[];
 };
 

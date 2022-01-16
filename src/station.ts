@@ -1,43 +1,39 @@
-import { createSvgElememt } from './dom';
-
 import { fetchStation, fetchStationData } from './api-client/index';
 import type { StationDataSeries } from './api-client/index';
 import type { Route } from './router';
+import { fetchExampleStation, fetchExampleStationData } from './example-data';
 
-const plot = (data: StationDataSeries) => {
-  const svg = createSvgElememt('svg', { viewBox: '0 0 100 100' });
-  const d = 'M10,10H90V90H10Z';
-  console.log(data);
-  svg.append(
-    createSvgElememt('path', {
-      fill: 'lightblue',
-      stroke: 'blue',
-      d,
-    })
-  );
-  const el = document.getElementById('app');
-  if (el) el.append(svg);
+import { createTimeSeriesChart } from './time-series-chart';
+
+const plot = (series: StationDataSeries) => {
+  const chart = createTimeSeriesChart('#app');
+  chart.addSeries({
+    data: series.data,
+  });
 };
 
 const showPlot = async (id: string) => {
   const since = new Date(Date.now() - 86400 * 1000 * 3).toISOString();
-  const categories = await fetchStationData(id, { since, ascending: true });
-  console.log(categories);
-  // plot(categories.level[0]);
+  const [categories] = await fetchStationData(id, { since, ascending: true });
+  const flowSeriesCount = categories?.flow?.length;
+  if (flowSeriesCount > 0) {
+    plot(categories.flow[0]);
+  }
 };
 
 export const stationPage = async ({ params }: Route) => {
   const { id } = params;
   const plotPromise = showPlot(id);
-  const [station] = await fetchStation(id);
+  const station = (await fetchStation(id)).value;
   const el = document.getElementById('app');
-  if (el) el.prepend(station.name);
+  if (el) el.innerHTML = `<div>${station.name}</div>`;
   return plotPromise;
 };
 
-export const exampleStationPage = () => {
-  const station = { name: 'Example station' };
+export const exampleStationPage = async () => {
+  const station = await fetchExampleStation();
+  const stationData = await fetchExampleStationData();
   const el = document.getElementById('app');
-  if (el) el.prepend(station.name);
-  // showPlot(id);
+  if (el) el.innerHTML = `<div>${station.name}</div>`;
+  plot(stationData.flow[0]);
 };
